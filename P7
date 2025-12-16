@@ -1,0 +1,42 @@
+class Solution {
+public:
+    int n, B;
+    vector<vector<int>> adj;
+    vector<int> pres, fut;
+    pair<vector<int>, vector<int>> dfs(int u) {
+        vector<int> noD(B+1, 0), withD(B+1, 0);
+        for(int v: adj[u]){
+            auto ch = dfs(v);
+            vector<int> t0(B+1, 0), t1(B+1, 0);
+            for(int i=0;i<=B;i++){
+                for(int j=0;j<=i;j++){
+                    t0[i] = max(t0[i], noD[i-j] + ch.first[j]);
+                    t1[i] = max(t1[i], withD[i-j] + ch.second[j]);
+                }
+            }
+            noD.swap(t0);
+            withD.swap(t1);
+        }
+        vector<int> res0 = noD, res1 = noD;
+        int price = fut[u], cost0 = pres[u];
+        for(int b=cost0;b<=B;b++){
+            res0[b] = max(res0[b], withD[b-cost0] + (price-cost0));
+        }
+        int cost1 = pres[u]/2;
+        for(int b=cost1;b<=B;b++){
+            res1[b] = max(res1[b], withD[b-cost1] + (price-cost1));
+        }
+        return make_pair(res0, res1);
+    }
+    int maxProfit(int n_, vector<int>& present, vector<int>& future, vector<vector<int>>& hierarchy, int budget) {
+        n = n_;
+        B = budget;
+        pres = present;
+        fut = future;
+        adj.assign(n, {});
+        for(auto &e: hierarchy){
+            adj[e[0]-1].push_back(e[1]-1);
+        }
+        return dfs(0).first[B];
+    }
+};
