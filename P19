@@ -1,0 +1,33 @@
+class Solution {
+public:
+    bool pyramidTransition(string bottom, vector<string>& allowed) {
+        unordered_map<string, vector<char>> mp;
+        for(auto &s : allowed) mp[s.substr(0,2)].push_back(s[2]);
+        unordered_map<string, bool> memo;
+        function<bool(string)> dfs = [&](string cur) {
+            if(cur.size() == 1) return true;
+            if(memo.count(cur)) return memo[cur];
+            vector<string> next;
+            function<void(int,string&)> gen = [&](int i, string& t) {
+                if(i == cur.size() - 1) {
+                    next.push_back(t);
+                    return;
+                }
+                string key = cur.substr(i,2);
+                if(!mp.count(key)) return;
+                for(char c : mp[key]) {
+                    t.push_back(c);
+                    gen(i + 1, t);
+                    t.pop_back();
+                }
+            };
+            string t;
+            gen(0, t);
+            for(auto &s : next) {
+                if(dfs(s)) return memo[cur] = true;
+            }
+            return memo[cur] = false;
+        };
+        return dfs(bottom);
+    }
+};
