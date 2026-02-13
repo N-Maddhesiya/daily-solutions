@@ -1,0 +1,44 @@
+class Solution{
+public:
+    int longestBalanced(string s){
+        int n=s.size();
+        int ans=0;
+        int cur=1;
+        for(int i=1;i<n;i++){
+            if(s[i]==s[i-1]) cur++; else cur=1;
+            ans=max(ans,cur);
+        }
+        ans=max(ans,n?1:0);
+        vector<pair<char,char>> pairs={{'a','b'},{'a','c'},{'b','c'}};
+        for(auto pr:pairs){
+            char x=pr.first,y=pr.second;
+            char z = 'a'+'b'+'c'-x-y;
+            unordered_map<int,int> mp;
+            mp.reserve(128);
+            int pref=0;
+            mp[0]=-1;
+            for(int i=0;i<n;i++){
+                if(s[i]==z){mp.clear();mp[0]=i;pref=0;continue;}
+                pref += (s[i]==x?1:-1);
+                if(!mp.count(pref)) mp[pref]=i;
+                else ans=max(ans,i-mp[pref]);
+            }
+        }
+        int offset=n;
+        long long base=2LL*n+1;
+        unordered_map<long long,int> mp;
+        mp.reserve(n*2+10);
+        int ca=0,cb=0,cc=0;
+        mp[(0+offset)*base+(0+offset)]=-1;
+        for(int i=0;i<n;i++){
+            if(s[i]=='a') ca++;
+            else if(s[i]=='b') cb++;
+            else cc++;
+            int d1=ca-cb,d2=ca-cc;
+            long long key=(long long)(d1+offset)*base+(d2+offset);
+            if(!mp.count(key)) mp[key]=i;
+            else ans=max(ans,i-mp[key]);
+        }
+        return ans;
+    }
+};
