@@ -1,0 +1,19 @@
+class Solution{
+public:
+    double champagneTower(int poured,int query_row,int query_glass){
+        vector<double> dp(101);
+        dp[0]=poured;
+        for(int r=0;r<query_row;r++){
+            vector<double> next(101);
+            for(int c=0;c<=r;c++){
+                if(dp[c]>1.0){
+                    double overflow=(dp[c]-1.0)/2.0;
+                    next[c]+=overflow;
+                    next[c+1]+=overflow;
+                }
+            }
+            dp=next;
+        }
+        return min(1.0,dp[query_glass]);
+    }
+};
